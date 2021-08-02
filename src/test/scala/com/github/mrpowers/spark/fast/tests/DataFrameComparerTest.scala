@@ -215,7 +215,7 @@ class DataFrameComparerTest extends FreeSpec with DataFrameComparer with SparkSe
 
   "assertSmallDataFrameEquality" - {
 
-    "can performed unordered DataFrame comparisons" in {
+    "can perform unordered DataFrame comparisons" in {
       val sourceDF = spark.createDF(
         List(
           (1),
