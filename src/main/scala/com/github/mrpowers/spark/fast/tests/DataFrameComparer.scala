@@ -12,6 +12,7 @@ trait DataFrameComparer extends DatasetComparer {
                                    ignoreNullable: Boolean = false,
                                    ignoreColumnNames: Boolean = false,
                                    orderedComparison: Boolean = true,
+                                   orderedColumnComparison: Boolean = true,
                                    truncate: Int = 500): Unit = {
     assertSmallDatasetEquality(
       actualDF,
@@ -19,6 +20,7 @@ trait DataFrameComparer extends DatasetComparer {
       ignoreNullable,
       ignoreColumnNames,
       orderedComparison,
+      orderedColumnComparison,
       truncate
     )
   }
@@ -30,13 +32,15 @@ trait DataFrameComparer extends DatasetComparer {
                                    expectedDF: DataFrame,
                                    ignoreNullable: Boolean = false,
                                    ignoreColumnNames: Boolean = false,
-                                   orderedComparison: Boolean = true): Unit = {
+                                   orderedComparison: Boolean = true,
+                                   orderedColumnComparison: Boolean = true): Unit = {
     assertLargeDatasetEquality(
       actualDF,
       expectedDF,
       ignoreNullable = ignoreNullable,
       ignoreColumnNames = ignoreColumnNames,
-      orderedComparison = orderedComparison
+      orderedComparison = orderedComparison,
+      orderedColumnComparison = orderedColumnComparison
     )
   }
 

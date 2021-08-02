@@ -81,6 +81,7 @@ Expected DataFrame Row Count: '${expectedCount}'
                                     ignoreNullable: Boolean = false,
                                     ignoreColumnNames: Boolean = false,
                                     orderedComparison: Boolean = true,
+                                    orderedColumnComparison: Boolean = true,
                                     truncate: Int = 500): Unit = {
     if (!SchemaComparer.equals(actualDS.schema, expectedDS.schema, ignoreNullable, ignoreColumnNames)) {
       throw DatasetSchemaMismatch(
@@ -126,9 +127,10 @@ Expected DataFrame Row Count: '${expectedCount}'
                                               equals: (T, T) => Boolean = naiveEquality _,
                                               ignoreNullable: Boolean = false,
                                               ignoreColumnNames: Boolean = false,
-                                              orderedComparison: Boolean = true): Unit = {
+                                              orderedComparison: Boolean = true,
+                                              orderedColumnComparison: Boolean = true): Unit = {
     // first check if the schemas are equal
-    if (!SchemaComparer.equals(actualDS.schema, expectedDS.schema, ignoreNullable, ignoreColumnNames)) {
+    if (!SchemaComparer.equals(actualDS.schema, expectedDS.schema, ignoreNullable, ignoreColumnNames, orderedColumnComparison)) {
       throw DatasetSchemaMismatch(betterSchemaMismatchMessage(actualDS, expectedDS))
     }
     // then check if the DataFrames have the same content
