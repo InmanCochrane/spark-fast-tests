@@ -150,9 +150,7 @@ Expected DataFrame Row Count: '${expectedCount}'
         val resultIndexValue: RDD[(Long, T)] = if (orderedColumnComparison) {
           RddHelpers.zipWithIndex(ds2.rdd)
         } else {
-          RddHelpers.zipWithIndex {
-            ds2.rdd.map { x => x } // TODO Something here that returns an RDD with the same schema as ds1, but for all T!
-          }
+          RddHelpers.zipWithIndex(ds2.select(ds1.columns.map(col): _*).rdd.map(_.asInstanceOf[T]))
         }
         val unequalRDD = expectedIndexValue
           .join(resultIndexValue)
