@@ -302,9 +302,62 @@ class DataFrameComparerTest extends FreeSpec with DataFrameComparer with SparkSe
         )
       )
 
-      pending
       assertLargeDataFrameEquality(sourceDF, expectedDF, orderedColumnComparison = false)
       assertSmallDataFrameEquality(sourceDF, expectedDF, orderedColumnComparison = false)
+    }
+
+    "performs comparisons of DataFrames with unordered columns and rows" in {
+      val sourceDF = spark.createDF(
+        List(
+          ("word", 1),
+          ("word", 5)
+        ),
+        List(
+          ("word", StringType, true),
+          ("number", IntegerType, true)
+        )
+      )
+
+      val expectedDF = spark.createDF(
+        List(
+          (5, "word"),
+          (1, "word")
+        ),
+        List(
+          ("number", IntegerType, true),
+          ("word", StringType, true)
+        )
+      )
+
+      assertLargeDataFrameEquality(sourceDF, expectedDF, orderedColumnComparison = false)
+      assertSmallDataFrameEquality(sourceDF, expectedDF, orderedColumnComparison = false)
+    }
+
+    "performs comparisons of DataFrames with unordered columns when nullable differences are ignored" in {
+      val sourceDF = spark.createDF(
+        List(
+          ("word", 1),
+          ("word", 5)
+        ),
+        List(
+          ("word", StringType, false),
+          ("number", IntegerType, true)
+        )
+      )
+
+      val expectedDF = spark.createDF(
+        List(
+          (1, "word"),
+          (5, "word")
+        ),
+        List(
+          ("number", IntegerType, true),
+          ("word", StringType, true)
+        )
+      )
+
+      assertLargeDataFrameEquality(sourceDF, expectedDF, ignoreNullable = true, orderedColumnComparison = false)
+      assertSmallDataFrameEquality(sourceDF, expectedDF, ignoreNullable = true, orderedColumnComparison = false)
     }
 
     "throws an error if the DataFrames content is different" in {

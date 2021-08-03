@@ -36,6 +36,11 @@ object SchemaComparer {
         """Cannot ignore column names when comparing columns out of order.
       Set `ignoreColumnNames = false` or `orderedColumnComparison = true`.""")
     }
-    throw DatasetSchemaMismatch("Unimplemented") // TODO
+    s1.forall { field =>
+      s2.find(_.name == field.name) match {
+        case Some(field2) => (ignoreNullable || field.nullable == field2.nullable) && (field.dataType == field2.dataType)
+        case None => false
+      }
+    }
   }
 }

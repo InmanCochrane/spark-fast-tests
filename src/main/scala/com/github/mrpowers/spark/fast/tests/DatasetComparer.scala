@@ -2,8 +2,8 @@ package com.github.mrpowers.spark.fast.tests
 
 import com.github.mrpowers.spark.fast.tests.DatasetComparerLike.naiveEquality
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Dataset, Row}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.{DataFrame, Dataset, Row}
 
 import scala.reflect.ClassTag
 
@@ -134,7 +134,7 @@ Expected DataFrame Row Count: '${expectedCount}'
       throw DatasetSchemaMismatch(betterSchemaMismatchMessage(actualDS, expectedDS))
     }
     // then check if the DataFrames have the same content
-    def throwIfDatasetsAreUnequal(ds1: Dataset[T], ds2: Dataset[T]) = {
+    def throwIfDatasetsAreUnequal(ds1: Dataset[T], ds2: Dataset[T], orderedColumnComparison: Boolean) = {
       try {
         ds1.rdd.cache
         ds2.rdd.cache
@@ -147,7 +147,13 @@ Expected DataFrame Row Count: '${expectedCount}'
         }
 
         val expectedIndexValue: RDD[(Long, T)] = RddHelpers.zipWithIndex(ds1.rdd)
-        val resultIndexValue: RDD[(Long, T)]   = RddHelpers.zipWithIndex(ds2.rdd)
+        val resultIndexValue: RDD[(Long, T)] = if (orderedColumnComparison) {
+          RddHelpers.zipWithIndex(ds2.rdd)
+        } else {
+          RddHelpers.zipWithIndex {
+            ds2.rdd.map { x => x } // TODO Something here that returns an RDD with the same schema as ds1, but for all T!
+          }
+        }
         val unequalRDD = expectedIndexValue
           .join(resultIndexValue)
           .filter {
@@ -168,9 +174,9 @@ Expected DataFrame Row Count: '${expectedCount}'
     }
 
     if (orderedComparison) {
-      throwIfDatasetsAreUnequal(actualDS, expectedDS)
+      throwIfDatasetsAreUnequal(actualDS, expectedDS, orderedColumnComparison)
     } else {
-      throwIfDatasetsAreUnequal(sortPreciseColumns(actualDS), sortPreciseColumns(expectedDS))
+      throwIfDatasetsAreUnequal(sortPreciseColumns(actualDS), sortPreciseColumns(expectedDS), orderedColumnComparison)
     }
   }
 
